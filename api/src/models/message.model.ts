@@ -30,4 +30,7 @@ const MessageSchema = new Schema<IMessage>(
 	{ timestamps: true },
 );
 
+// Index to optimize queries for messages in a chat
+MessageSchema.index({ chat: 1, createdAt: 1 });
+
 export const Message = mongoose.model<IMessage>("Message", MessageSchema);
