@@ -65,5 +65,8 @@ export async function authCallback(req: Request, res: Response, next: NextFuncti
 		}
 
 		res.json(user);
-	} catch (error) {}
+	} catch (error) {
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+		next(error);
+	}
 }

@@ -63,6 +63,18 @@ export const initializeSocket = (httpServer: HttpServer) => {
 			try {
 				const { chatId, content } = data;
 
+				if (!chatId || typeof chatId !== "string" || !chatId.match(/^[a-f\d]{24}$/i)) {
+					return socket.emit("socket-error", { message: "Invalid chat ID" });
+				}
+
+				if (!content || typeof content !== "string" || content.trim().length === 0) {
+					return socket.emit("socket-error", { message: "Message content is required" });
+				}
+
+				if (content.length > 5000) {
+					return socket.emit("socket-error", { message: "Message content is too long" });
+				}
+
 				const chat = await Chat.findOne({ _id: chatId, participants: userId });
 
 				if (!chat) {
