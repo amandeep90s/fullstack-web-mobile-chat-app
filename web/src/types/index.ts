@@ -1,5 +1,8 @@
 // ─── Base ────────────────────────────────────────────────────────────────────
 
+import type { QueryClient } from "@tanstack/react-query";
+import type { Socket } from "socket.io-client";
+
 export interface IUser {
 	_id: string;
 	clerkId: string;
@@ -83,3 +86,24 @@ export interface IApiError {
 	message: string;
 	stack?: string;
 }
+
+// ─── Socket store ────────────────────────────────────────────────────────────
+
+export interface ISocketState {
+	socket: Socket | null;
+	onlineUsers: Set<string>;
+	typingUsers: Map<string, string>; // chatId → userId
+	queryClient: QueryClient | null;
+}
+
+export interface ISocketActions {
+	connect: (token: string, queryClient: QueryClient) => void;
+	disconnect: () => void;
+	joinChat: (chatId: string) => void;
+	leaveChat: (chatId: string) => void;
+	/** currentUser must be mapped to IMessageSender before calling (name, email, avatarUrl) */
+	sendMessage: (chatId: string, content: string, currentUser: IMessageSender) => void;
+	setTyping: (chatId: string, isTyping: boolean) => void;
+}
+
+export type ISocketStore = ISocketState & ISocketActions;
