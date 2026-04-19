@@ -14,7 +14,13 @@ if (!PUBLISHABLE_KEY) {
 	throw new Error("Missing Publishable Key");
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			retry: 1,
+		},
+	},
+});
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
