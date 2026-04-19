@@ -8,7 +8,7 @@ import { useEffect } from "react";
  * @param activeChatId The ID of the currently active chat, used to join or leave chat rooms as needed.
  * @returns An object containing the socket connection state and functions to manage the connection and chat room membership.
  */
-export const useSocketConnection = (activeChatId: string): void => {
+export const useSocketConnection = (activeChatId: string | undefined = undefined): void => {
 	const { getToken, isSignedIn } = useAuth();
 	const queryClient = useQueryClient();
 

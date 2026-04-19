@@ -3,8 +3,10 @@
  * @param date - The date to format
  * @returns A formatted string representing the time difference (e.g., "now", "5m ago", "3:45 PM", "Mon", "Jan 1")
  */
-export function formatTime(date: Date): string {
-	if (!date) return "";
+export function formatTime(dateString: string): string {
+	const date = new Date(dateString);
+
+	if (isNaN(date.getTime())) return "";
 
 	const day = new Date(date);
 	const now = new Date();

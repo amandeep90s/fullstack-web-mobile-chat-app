@@ -1,41 +1,26 @@
 import axiosInstance from "@/lib/axios";
 import type { IUser } from "@/types";
 import { useAuth } from "@clerk/react";
-import { useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 /**
- * Custom hook to synchronize the authenticated user's information with the backend.
- * @returns An object containing the synchronization state, including whether the user information is currently being synchronized and whether it has been successfully synchronized.
+ * Custom hook to synchronize the authenticated user's information with the backend and fetch the list of users.
+ * @returns An object containing the query state and data for the users, as well as the synchronization state of the user information.
+ * The query will automatically synchronize the user's information with the backend and fetch the list of users when the component using this hook is mounted and the user is signed in.
+ * The query will also refetch the users whenever the user's authentication state changes (e.g., when the user signs in or out).
+ * The query will return the list of users from the backend, which can be used to display user information in the UI or for other purposes.
  */
 export const useUsers = () => {
-	const { isSignedIn, getToken } = useAuth();
+	const { getToken } = useAuth();
 
-	const {
-		mutate: syncUser,
-		isPending,
-		isSuccess,
-	} = useMutation<IUser>({
-		mutationFn: async () => {
+	return useQuery<IUser[]>({
+		queryKey: ["users"],
+		queryFn: async () => {
 			const token = await getToken();
-
-			const response = await axiosInstance.post<IUser>(
-				"/auth/callback",
-				{},
-				{
-					headers: { Authorization: `Bearer ${token}` },
-				},
-			);
-
-			return response.data;
+			const res = await axiosInstance.get<IUser[]>("/users", {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			return res.data;
 		},
 	});
-
-	useEffect(() => {
-		if (isSignedIn && !isPending && !isSuccess) {
-			syncUser();
-		}
-	}, [isPending, isSignedIn, isSuccess, syncUser]);
-
-	return { isSynced: isSuccess, isSyncing: isPending } satisfies { isSynced: boolean; isSyncing: boolean };
 };
